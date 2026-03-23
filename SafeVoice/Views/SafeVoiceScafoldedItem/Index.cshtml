@@ -1,0 +1,101 @@
+@model IEnumerable<SafeVoice.Models.Report>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ReportingAs)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.VictimName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.VictimAge)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RelationshipToVictim)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ReporterName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ReporterContact)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Location)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Latitude)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Longitude)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateSubmitted)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReportingAs)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.VictimName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.VictimAge)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RelationshipToVictim)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReporterName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReporterContact)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Location)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Latitude)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Longitude)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateSubmitted)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
