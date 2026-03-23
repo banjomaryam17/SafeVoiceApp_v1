@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SafeVoice.Controllers;
 
-public class AccointController : Controller
+public class AccountController : Controller
 {
     // GET
     public IActionResult Index()
