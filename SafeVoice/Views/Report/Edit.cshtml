@@ -19,8 +19,13 @@
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ReportingAs" class="control-label"></label>
-                <select asp-for="ReportingAs" class="form-control"></select>
+                <label asp-for="ReportingAs" class="control-label">I am reporting this for:</label>
+                <select asp-for="ReportingAs" class="form-control">
+                    <option value="">-- Please select --</option>
+                    <option value="Myself">Myself</option>
+                    <option value="SomeoneElse">Someone else</option>
+                    <option value="Anonymous">Anonymous (I prefer not to say)</option>
+                </select>
                 <span asp-validation-for="ReportingAs" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -64,9 +69,10 @@
                 <span asp-validation-for="Longitude" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <select asp-for="Status" class="form-control"></select>
-                <span asp-validation-for="Status" class="text-danger"></span>
+                <label class="control-label">Status</label>
+                <input type="text" value="Pending" class="form-control" readonly />
+                <input type="hidden" asp-for="Status" />
+                <small class="text-muted">Only administrators can change report status</small>
             </div>
             <div class="form-group">
                 <label asp-for="DateSubmitted" class="control-label"></label>
