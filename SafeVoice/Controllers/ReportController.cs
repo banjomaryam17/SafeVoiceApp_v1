@@ -49,13 +49,20 @@ namespace SafeVoice.Controllers
             return View();
         }
 
-        // POST: ReportController/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Description,ReportingAs,VictimName,VictimAge,RelationshipToVictim,ReporterName,ReporterContact,Location,Latitude,Longitude,Status,DateSubmitted")] Report report)
         {
+            Console.WriteLine($"ModelState.IsValid: {ModelState.IsValid}");
+    
+            if (!ModelState.IsValid)
+            {
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    Console.WriteLine($"Validation error: {error.ErrorMessage}");
+                }
+            }
+    
             if (ModelState.IsValid)
             {
                 _context.Add(report);
