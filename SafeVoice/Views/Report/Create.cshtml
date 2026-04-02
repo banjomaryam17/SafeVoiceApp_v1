@@ -1,85 +1,214 @@
 @model SafeVoice.Models.Report
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Submit a Report";
 }
+<link rel="stylesheet" href="~/css/reports.css" />
 
-<h1>Create</h1>
+<div class="report-container">
+    <div class="report-header">
+        <h1>Submit a Safeguarding Report</h1>
+        <p>Your report helps protect children in our community. All information is confidential.</p>
+    </div>
+    
+    <div class="report-content">
+        <form asp-action="Create" novalidate>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            
+            <!-- Incident Details Section -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <span class="icon">📝</span>
+                    Incident Details
+                </h3>
+                
+                <div class="form-group-enhanced">
+                    <label for="Description" class="form-label-enhanced">Description of Incident *</label>
+                    <textarea asp-for="Description" class="form-control-enhanced" rows="4" 
+                              placeholder="Please provide a clear description of what happened..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
 
-<h4>Report</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
+            <!-- Reporting Information Section -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <span class="icon">👤</span>
+                    Reporting Information
+                </h3>
+                
+                <div class="form-group-enhanced">
+                    <label for="ReportingAs" class="form-label-enhanced">I am reporting this for: *</label>
+                    <select asp-for="ReportingAs" class="form-control-enhanced reporting-as-select" id="reportingAsSelect">
+                        <option value="">-- Please select --</option>
+                        <option value="Myself">Myself</option>
+                        <option value="SomeoneElse">Someone else</option>
+                        <option value="Anonymous">Anonymous (I prefer not to say)</option>
+                    </select>
+                    <span asp-validation-for="ReportingAs" class="text-danger"></span>
+                </div>
+
+                <div id="victimSection" class="conditional-section">
+                    <div class="form-group-enhanced">
+                        <label for="VictimName" class="form-label-enhanced">Person Affected (Name)</label>
+                        <input asp-for="VictimName" class="form-control-enhanced" 
+                               placeholder="First name or initials only" />
+                        <span asp-validation-for="VictimName" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group-enhanced">
+                        <label for="VictimAge" class="form-label-enhanced">Age</label>
+                        <input asp-for="VictimAge" type="number" class="form-control-enhanced" 
+                               placeholder="Age of person affected" min="0" max="18" />
+                        <span asp-validation-for="VictimAge" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div id="relationshipSection" class="conditional-section" style="display: none;">
+                    <div class="form-group-enhanced">
+                        <label for="RelationshipToVictim" class="form-label-enhanced">Your Relationship to the Person</label>
+                        <select asp-for="RelationshipToVictim" class="form-control-enhanced">
+                            <option value="">-- Select relationship --</option>
+                            <option value="Parent/Guardian">Parent/Guardian</option>
+                            <option value="Family Member">Family Member</option>
+                            <option value="Teacher">Teacher</option>
+                            <option value="Friend">Friend</option>
+                            <option value="Neighbor">Neighbor</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <span asp-validation-for="RelationshipToVictim" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="ReportingAs" class="control-label">I am reporting this for:</label>
-                <select asp-for="ReportingAs" class="form-control">
-                    <option value="">-- Please select --</option>
-                    <option value="0">Myself</option>
-                    <option value="1">Someone else</option>
-                    <option value="2">Anonymous (I prefer not to say)</option>
-                </select>
-                <span asp-validation-for="ReportingAs" class="text-danger"></span>
+
+            <!-- Contact Information Section -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <span class="icon">📞</span>
+                    Contact Information (Optional)
+                </h3>
+                
+                <div class="help-text">
+                    Providing contact information allows us to follow up if needed, but this is optional for your privacy.
+                </div>
+                
+                <div class="form-group-enhanced">
+                    <label for="ReporterName" class="form-label-enhanced">Your Name</label>
+                    <input asp-for="ReporterName" class="form-control-enhanced" 
+                           placeholder="Your name (optional)" />
+                    <span asp-validation-for="ReporterName" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group-enhanced">
+                    <label for="ReporterContact" class="form-label-enhanced">Contact (Email or Phone)</label>
+                    <input asp-for="ReporterContact" class="form-control-enhanced" 
+                           placeholder="Email or phone number (optional)" />
+                    <span asp-validation-for="ReporterContact" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="VictimName" class="control-label"></label>
-                <input asp-for="VictimName" class="form-control" />
-                <span asp-validation-for="VictimName" class="text-danger"></span>
+
+            <!-- Location Section -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <span class="icon">📍</span>
+                    Location Information
+                </h3>
+                
+                <div class="form-group-enhanced">
+                    <label for="Location" class="form-label-enhanced">Location of Incident *</label>
+                    <input asp-for="Location" class="form-control-enhanced" 
+                           placeholder="e.g., School name, area, or general location" />
+                    <span asp-validation-for="Location" class="text-danger"></span>
+                    
+                    <div class="location-helper">
+                        <button type="button" class="location-button" id="detectLocation">
+                            📍 Auto-Detect My Location
+                        </button>
+                        <small id="locationStatus" class="text-muted d-block mt-2"></small>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="VictimAge" class="control-label"></label>
-                <input asp-for="VictimAge" class="form-control" />
-                <span asp-validation-for="VictimAge" class="text-danger"></span>
+
+            <!-- Hidden Fields -->
+            <div class="hidden-fields">
+                <input asp-for="Latitude" type="hidden" id="latitudeField" />
+                <input asp-for="Longitude" type="hidden" id="longitudeField" />
+                <input asp-for="DateSubmitted" type="hidden" value="@DateTime.Now" />
             </div>
-            <div class="form-group">
-                <label asp-for="RelationshipToVictim" class="control-label"></label>
-                <input asp-for="RelationshipToVictim" class="form-control" />
-                <span asp-validation-for="RelationshipToVictim" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ReporterName" class="control-label"></label>
-                <input asp-for="ReporterName" class="form-control" />
-                <span asp-validation-for="ReporterName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ReporterContact" class="control-label"></label>
-                <input asp-for="ReporterContact" class="form-control" />
-                <span asp-validation-for="ReporterContact" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Location" class="control-label"></label>
-                <input asp-for="Location" class="form-control" />
-                <span asp-validation-for="Location" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Latitude" class="control-label"></label>
-                <input asp-for="Latitude" class="form-control" />
-                <span asp-validation-for="Latitude" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Longitude" class="control-label"></label>
-                <input asp-for="Longitude" class="form-control" />
-                <span asp-validation-for="Longitude" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DateSubmitted" class="control-label"></label>
-                <input asp-for="DateSubmitted" class="form-control" />
-                <span asp-validation-for="DateSubmitted" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+            
+            <div class="submit-section">
+                <button type="submit" class="submit-button">
+                    Submit Report Securely
+                </button>
             </div>
         </form>
+        
+        <div style="text-align: center;">
+            <a asp-action="Index" class="back-link">← Back to Reports</a>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+<script>
+// Show/hide sections based on reporting type
+document.getElementById('reportingAsSelect').addEventListener('change', function() {
+    const value = this.value;
+    const victimSection = document.getElementById('victimSection');
+    const relationshipSection = document.getElementById('relationshipSection');
+    
+    // Reset visibility
+    victimSection.style.display = 'block';
+    relationshipSection.style.display = 'none';
+    
+    if (value === 'SomeoneElse') {
+        relationshipSection.style.display = 'block';
+    } else if (value === 'Anonymous') {
+        victimSection.style.display = 'none';
+    }
+});
 
+// Location detection
+document.getElementById('detectLocation').addEventListener('click', function() {
+    const status = document.getElementById('locationStatus');
+    const button = this;
+    
+    button.disabled = true;
+    button.textContent = '📍 Detecting...';
+    status.textContent = 'Getting your location...';
+    status.className = 'text-muted d-block mt-2';
+    
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                document.getElementById('latitudeField').value = position.coords.latitude;
+                document.getElementById('longitudeField').value = position.coords.longitude;
+                status.textContent = '✅ Location detected successfully';
+                status.className = 'text-success d-block mt-2';
+                button.textContent = '✅ Location Detected';
+                button.disabled = false;
+            },
+            function(error) {
+                status.textContent = '❌ Could not detect location. Please enter manually.';
+                status.className = 'text-danger d-block mt-2';
+                button.textContent = '📍 Auto-Detect My Location';
+                button.disabled = false;
+            }
+        );
+    } else {
+        status.textContent = '❌ Geolocation not supported by your browser.';
+        status.className = 'text-danger d-block mt-2';
+        button.textContent = '📍 Auto-Detect My Location';
+        button.disabled = false;
+    }
+});
+
+// Set current date/time on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const now = new Date();
+    const isoString = now.toISOString().slice(0, 16);
+    const dateField = document.querySelector('input[name="DateSubmitted"]');
+    if (dateField) {
+        dateField.value = isoString;
+    }
+});
+</script>

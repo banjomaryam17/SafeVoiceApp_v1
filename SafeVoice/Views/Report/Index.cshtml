@@ -1,101 +1,140 @@
 @model IEnumerable<SafeVoice.Models.Report>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Reports Dashboard";
 }
 
-<h1>Index</h1>
+<link rel="stylesheet" href="~/css/reports.css" />
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ReportingAs)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.VictimName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.VictimAge)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RelationshipToVictim)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ReporterName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ReporterContact)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Location)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Latitude)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Longitude)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateSubmitted)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReportingAs)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.VictimName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.VictimAge)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RelationshipToVictim)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReporterName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReporterContact)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Location)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Latitude)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Longitude)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateSubmitted)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>SafeVoice Reports Dashboard</h1>
+        <p>Manage and review child safety reports</p>
+    </div>
+
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-number">@Model.Count()</div>
+            <div class="stat-label">Total Reports</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">@Model.Count(r => r.Status == SafeVoice.Models.ReportStatus.Pending)</div>
+            <div class="stat-label">Pending Review</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">@Model.Count(r => r.Status == SafeVoice.Models.ReportStatus.Accepted)</div>
+            <div class="stat-label">Accepted</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">@Model.Count(r => r.Status == SafeVoice.Models.ReportStatus.Rejected)</div>
+            <div class="stat-label">Rejected</div>
+        </div>
+    </div>
+
+    <div class="actions-bar">
+        <a asp-action="Create" class="create-button">
+            <span>📝</span>
+            Submit New Report
+        </a>
+        
+        <div class="filter-section">
+            <label for="statusFilter">Filter by Status:</label>
+            <select id="statusFilter" class="filter-select">
+                <option value="">All Reports</option>
+                <option value="Pending">Pending</option>
+                <option value="Accepted">Accepted</option>
+                <option value="Rejected">Rejected</option>
+            </select>
+        </div>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="reports-grid" id="reportsGrid">
+            @foreach (var item in Model.OrderByDescending(r => r.DateSubmitted))
+            {
+                <div class="report-card" data-status="@item.Status">
+                    <div class="report-header">
+                        <div class="report-id">Report #@item.Id</div>
+                        <div class="report-description">@Html.DisplayFor(modelItem => item.Description)</div>
+                    </div>
+                    
+                    <div class="report-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Reported By</span>
+                            <span class="meta-value">
+                                @if (!string.IsNullOrEmpty(item.ReporterName))
+                                {
+                                    @item.ReporterName
+                                }
+                                else
+                                {
+                                    <em>@item.ReportingAs</em>
+                                }
+                            </span>
+                        </div>
+                        
+                        <div class="meta-item">
+                            <span class="meta-label">Location</span>
+                            <span class="meta-value">@Html.DisplayFor(modelItem => item.Location)</span>
+                        </div>
+                        
+                        <div class="meta-item">
+                            <span class="meta-label">Date Submitted</span>
+                            <span class="meta-value">@item.DateSubmitted.ToString("MMM dd, yyyy")</span>
+                        </div>
+                        
+                        <div class="meta-item">
+                            <span class="meta-label">Status</span>
+                            <span class="meta-value">
+                                <span class="status-badge status-@item.Status.ToString().ToLower()">
+                                    @Html.DisplayFor(modelItem => item.Status)
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="report-actions">
+                        <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn-view">
+                            <span>👁</span> View
+                        </a>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn btn-edit">
+                            <span>✏️</span> Edit
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn btn-delete">
+                            <span>🗑</span> Delete
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <h3>No Reports Found</h3>
+            <p>There are currently no reports in the system. Submit the first report to get started.</p>
+            <a asp-action="Create" class="create-button">
+                <span>📝</span>
+                Submit First Report
+            </a>
+        </div>
+    }
+</div>
+
+<script>
+// Filter functionality
+document.getElementById('statusFilter').addEventListener('change', function() {
+    const filterValue = this.value;
+    const reportCards = document.querySelectorAll('.report-card');
+    
+    reportCards.forEach(card => {
+        const cardStatus = card.getAttribute('data-status');
+        if (filterValue === '' || cardStatus === filterValue) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+});
+</script>
