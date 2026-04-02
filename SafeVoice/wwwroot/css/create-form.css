@@ -1,0 +1,229 @@
+:root {
+    --primary-blue: #2c5aa0;
+    --secondary-blue: #4a7ab8;
+    --trust-green: #3e8e4a;
+    --warm-accent: #f4a261;
+    --soft-gray: #f8f9fa;
+    --text-dark: #2c3e50;
+    --border-light: #e1e5e9;
+}
+
+.report-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(44, 90, 160, 0.1);
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.report-header {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.report-header h1 {
+    margin: 0;
+    font-size: 2.2rem;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+}
+
+.report-header p {
+    margin: 0.5rem 0 0 0;
+    opacity: 0.9;
+    font-size: 1.1rem;
+}
+
+.report-content {
+    padding: 2.5rem;
+}
+
+.form-section {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.section-title {
+    color: var(--primary-blue);
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.section-title .icon {
+    margin-right: 0.5rem;
+    font-size: 1.4rem;
+}
+
+.form-group-enhanced {
+    margin-bottom: 1.5rem;
+}
+
+.form-label-enhanced {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.form-control-enhanced {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border-light);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: #fff;
+    box-sizing: border-box;
+}
+
+.form-control-enhanced:focus {
+    outline: none;
+    border-color: var(--secondary-blue);
+    box-shadow: 0 0 0 3px rgba(74, 122, 184, 0.1);
+}
+
+.reporting-as-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+.location-helper {
+    margin-top: 1rem;
+}
+
+.location-button {
+    background: var(--trust-green);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.location-button:hover {
+    background: #2f7636;
+}
+
+.submit-section {
+    text-align: center;
+    padding-top: 2rem;
+}
+
+.submit-button {
+    background: linear-gradient(135deg, var(--trust-green) 0%, #2f7636 100%);
+    color: white;
+    border: none;
+    padding: 16px 40px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+    min-width: 200px;
+}
+
+.submit-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(62, 142, 74, 0.3);
+}
+
+.help-text {
+    background: var(--soft-gray);
+    padding: 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    margin-top: 1rem;
+    border-left: 4px solid var(--warm-accent);
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 2rem;
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.back-link:hover {
+    color: var(--secondary-blue);
+    text-decoration: underline;
+}
+
+.hidden-fields {
+    display: none;
+}
+
+.conditional-section {
+    transition: opacity 0.3s ease;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+}
+
+.text-danger {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.text-success {
+    color: #198754;
+}
+
+.text-muted {
+    color: #6c757d;
+}
+
+.d-block {
+    display: block;
+}
+
+.mt-2 {
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .report-container {
+        margin: 1rem;
+        border-radius: 8px;
+    }
+
+    .report-content {
+        padding: 1.5rem;
+    }
+
+    .report-header {
+        padding: 1.5rem;
+    }
+
+    .report-header h1 {
+        font-size: 1.8rem;
+    }
+}
