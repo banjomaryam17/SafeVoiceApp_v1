@@ -1,8 +1,13 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "SafeVoice - Child Safety Platform";
 }
 
+<script>
+    // Redirect to Reports dashboard
+    window.location.href = '@Url.Action("Index", "Report")';
+</script>
+
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">SafeVoice</h1>
+    <p>Redirecting to Reports Dashboard...</p>
 </div>
