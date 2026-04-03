@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using SafeVoice.Models;
 
 namespace SafeVoice.Controllers
 {
+    [Authorize] 
     public class ReportController : Controller
     {
         private readonly AppDbContext _context;
@@ -44,12 +46,14 @@ namespace SafeVoice.Controllers
         }
 
         // GET: ReportController/Create
+        [AllowAnonymous]
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Description,ReportingAs,VictimName,VictimAge,RelationshipToVictim,ReporterName,ReporterContact,Location,Latitude,Longitude,Status,DateSubmitted")] Report report)
         {
