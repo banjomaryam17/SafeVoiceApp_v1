@@ -1,0 +1,159 @@
+@model IEnumerable<SafeVoice.Models.SupportLocation>
+
+@{
+    ViewData["Title"] = "Support Locations";
+}
+
+<link rel="stylesheet" href="~/css/reports.css" />
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Support & Help Locations</h1>
+        <p>Find child safety support services near you</p>
+    </div>
+
+    <div class="actions-bar">
+        @if (User.IsInRole("Moderator") || User.IsInRole("Garda") || User.IsInRole("SocialServices") || User.IsInRole("SuperAdmin"))
+        {
+            <a asp-action="Create" class="create-button">
+                <span>➕</span>
+                Add Support Location
+            </a>
+        }
+        
+        <div class="filter-section">
+            <button onclick="detectUserLocation()" class="location-button" id="findNearestBtn">
+                📍 Find Nearest Help
+            </button>
+        </div>
+    </div>
+
+    <div id="nearestResults" style="display: none;" class="dashboard-stats">
+        <h3>Nearest Support Locations</h3>
+        <div id="nearestList"></div>
+    </div>
+
+    <div class="reports-grid">
+        @foreach (var location in Model.GroupBy(l => l.Type))
+        {
+            <div class="report-card">
+                <div class="report-header">
+                    <h3>@location.Key.GetDisplayName() (@location.Count())</h3>
+                </div>
+                
+                @foreach (var item in location)
+                {
+                    <div class="report-meta" style="margin-bottom: 1rem;">
+                        <div class="meta-item">
+                            <span class="meta-label">@item.Type.GetIconClass() @item.Name</span>
+                            <span class="meta-value">@item.Address</span>
+                        </div>
+                        
+                        <div class="meta-item">
+                            <span class="meta-label">Contact</span>
+                            <span class="meta-value">
+                                @if (!string.IsNullOrEmpty(item.Phone))
+                                {
+                                    <a href="tel:@item.Phone">📞 @item.Phone</a><br />
+                                }
+                                @if (!string.IsNullOrEmpty(item.Email))
+                                {
+                                    <a href="mailto:@item.Email">✉️ @item.Email</a>
+                                }
+                            </span>
+                        </div>
+                        
+                        @if (!string.IsNullOrEmpty(item.OpeningHours))
+                        {
+                            <div class="meta-item">
+                                <span class="meta-label">Hours</span>
+                                <span class="meta-value">@item.OpeningHours</span>
+                            </div>
+                        }
+                        
+                        <div class="meta-item">
+                            <span class="meta-label">Actions</span>
+                            <span class="meta-value">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn-view">View</a>
+                                @if (User.IsInRole("Moderator") || User.IsInRole("Garda") || User.IsInRole("SocialServices") || User.IsInRole("SuperAdmin"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn btn-edit">Edit</a>
+                                }
+                            </span>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+function detectUserLocation() {
+    const btn = document.getElementById('findNearestBtn');
+    const resultsDiv = document.getElementById('nearestResults');
+    const resultsList = document.getElementById('nearestList');
+    
+    btn.textContent = '📍 Detecting...';
+    btn.disabled = true;
+    
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                findNearestLocations(position.coords.latitude, position.coords.longitude);
+            },
+            function(error) {
+                btn.textContent = '📍 Find Nearest Help';
+                btn.disabled = false;
+                alert('Could not detect your location. Please try again.');
+            }
+        );
+    } else {
+        btn.textContent = '📍 Find Nearest Help';
+        btn.disabled = false;
+        alert('Geolocation is not supported by this browser.');
+    }
+}
+
+function findNearestLocations(lat, lng) {
+    fetch(`/Support/GetNearest?latitude=${lat}&longitude=${lng}&maxResults=5`)
+        .then(response => response.json())
+        .then(data => {
+            displayNearestLocations(data);
+            document.getElementById('findNearestBtn').textContent = '📍 Find Nearest Help';
+            document.getElementById('findNearestBtn').disabled = false;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('findNearestBtn').textContent = '📍 Find Nearest Help';
+            document.getElementById('findNearestBtn').disabled = false;
+        });
+}
+
+function displayNearestLocations(locations) {
+    const resultsDiv = document.getElementById('nearestResults');
+    const resultsList = document.getElementById('nearestList');
+    
+    if (locations.length === 0) {
+        resultsList.innerHTML = '<p>No support locations found nearby.</p>';
+        resultsDiv.style.display = 'block';
+        return;
+    }
+    
+    let html = '';
+    locations.forEach(location => {
+        html += `
+            <div class="stat-card">
+                <div class="stat-label">${location.typeIcon} ${location.name}</div>
+                <div class="meta-value">${location.address}</div>
+                <div class="meta-value">${location.distance} km away</div>
+                ${location.phone ? `<div class="meta-value">📞 <a href="tel:${location.phone}">${location.phone}</a></div>` : ''}
+                ${location.is24Hour ? '<div class="meta-value">🕐 24/7 Service</div>' : ''}
+            </div>
+        `;
+    });
+    
+    resultsList.innerHTML = html;
+    resultsDiv.style.display = 'block';
+}
+</script>
