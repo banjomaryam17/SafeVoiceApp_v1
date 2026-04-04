@@ -1,7 +1,7 @@
 @model IEnumerable<SafeVoice.Models.SupportLocation>
 
 @{
-    ViewData["Title"] = "Support Locations";
+    ViewData["Title"] = "Support Locations - SafeVoice";
 }
 
 <link rel="stylesheet" href="~/css/reports.css" />
@@ -9,22 +9,42 @@
 <div class="dashboard-container">
     <div class="dashboard-header">
         <h1>Support & Help Locations</h1>
-        <p>Find child safety support services near you</p>
+        <p>Find child safety support services and report incidents confidentially</p>
+    </div>
+
+    <!-- Prominent Report Button Section -->
+    <div style="background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%); border-radius: 12px; padding: 2rem; margin-bottom: 2rem; text-align: center; color: white;">
+        <h2 style="color: white; margin-bottom: 1rem; font-weight: 300;">📢 Need to Report an Incident?</h2>
+        <p style="margin-bottom: 1.5rem; opacity: 0.9; font-size: 1.1rem;">
+            If you need to report a child safety concern, your report will be handled confidentially by trained professionals.
+        </p>
+        <a asp-controller="Report" asp-action="Create" class="create-button" style="background: white; color: #dc3545; font-size: 1.2rem; padding: 18px 35px; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+            Report an Incident Now
+        </a>
     </div>
 
     <div class="actions-bar">
-        @if (User.IsInRole("Moderator") || User.IsInRole("Garda") || User.IsInRole("SocialServices") || User.IsInRole("SuperAdmin"))
-        {
-            <a asp-action="Create" class="create-button">
-                <span>➕</span>
-                Add Support Location
-            </a>
-        }
-        
-        <div class="filter-section">
-            <button onclick="detectUserLocation()" class="location-button" id="findNearestBtn">
-                📍 Find Nearest Help
-            </button>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+            @if (User.IsInRole("Moderator") || User.IsInRole("Garda") || User.IsInRole("SocialServices") || User.IsInRole("SuperAdmin"))
+            {
+                <a asp-action="Create" class="create-button">
+                    <span>➕</span>
+                    Add Support Location
+                </a>
+            }
+            
+            @if (User.IsInRole("SuperAdmin") || User.IsInRole("Garda") || User.IsInRole("SocialServices"))
+            {
+                <a asp-controller="Admin" asp-action="Index" class="create-button" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%);">
+                    Admin Dashboard
+                </a>
+            }
+            
+            <div class="filter-section">
+                <button onclick="detectUserLocation()" class="location-button" id="findNearestBtn">
+                   Find Nearest Help
+                </button>
+            </div>
         </div>
     </div>
 
@@ -94,7 +114,7 @@ function detectUserLocation() {
     const resultsDiv = document.getElementById('nearestResults');
     const resultsList = document.getElementById('nearestList');
     
-    btn.textContent = '📍 Detecting...';
+    btn.textContent = ' Detecting...';
     btn.disabled = true;
     
     if (navigator.geolocation) {
@@ -103,13 +123,13 @@ function detectUserLocation() {
                 findNearestLocations(position.coords.latitude, position.coords.longitude);
             },
             function(error) {
-                btn.textContent = '📍 Find Nearest Help';
+                btn.textContent = ' Find Nearest Help';
                 btn.disabled = false;
                 alert('Could not detect your location. Please try again.');
             }
         );
     } else {
-        btn.textContent = '📍 Find Nearest Help';
+        btn.textContent = ' Find Nearest Help';
         btn.disabled = false;
         alert('Geolocation is not supported by this browser.');
     }

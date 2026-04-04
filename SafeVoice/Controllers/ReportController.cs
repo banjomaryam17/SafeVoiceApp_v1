@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,13 +21,32 @@ namespace SafeVoice.Controllers
         {
             _context = context;
         }
-
-        // GET: ReportController
+        [Authorize] // Require login
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Reports.ToListAsync());
-        }
+            IQueryable<Report> reportsQuery;
+    
+            // Role-based access control
+            if (User.IsInRole("SuperAdmin") || User.IsInRole("Garda") || User.IsInRole("SocialServices") || User.IsInRole("Moderator"))
+            {
+                // Admins/staff can see ALL reports
+                reportsQuery = _context.Reports.Include(r => r.SubmittedByUser);
+            }
+            else
+            {
+                // Regular users can ONLY see their own reports
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+                reportsQuery = _context.Reports
+                    .Include(r => r.SubmittedByUser)
+                    .Where(r => r.SubmittedByUserId == userId);
+            }
 
+            var reports = await reportsQuery
+                .OrderByDescending(r => r.DateSubmitted)
+                .ToListAsync();
+
+            return View(reports);
+        }
         // GET: ReportController/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -51,24 +71,20 @@ namespace SafeVoice.Controllers
         {
             return View();
         }
-
         [HttpPost]
-        [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Description,ReportingAs,VictimName,VictimAge,RelationshipToVictim,ReporterName,ReporterContact,Location,Latitude,Longitude,Status,DateSubmitted")] Report report)
+        public async Task<IActionResult> Create([Bind("Description,ReportingAs,VictimName,VictimAge,RelationshipToVictim,ReporterName,ReporterContact,Location,Latitude,Longitude")] Report report)
         {
-            Console.WriteLine($"ModelState.IsValid: {ModelState.IsValid}");
-    
-            if (!ModelState.IsValid)
-            {
-                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    Console.WriteLine($"Validation error: {error.ErrorMessage}");
-                }
-            }
-    
             if (ModelState.IsValid)
             {
+                report.DateSubmitted = DateTime.Now;
+        
+                // Link to logged-in user if authenticated
+                if (User.Identity.IsAuthenticated)
+                {
+                    report.SubmittedByUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+                }
+        
                 _context.Add(report);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
