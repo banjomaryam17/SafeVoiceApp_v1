@@ -1,0 +1,85 @@
+@model AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<link rel="stylesheet" href="~/css/reports.css" />
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>🔐 Administrative Dashboard</h1>
+        <p>System management for SafeVoice platform</p>
+    </div>
+
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-number">@Model.TotalReports</div>
+            <div class="stat-label">Total Reports</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">@Model.PendingReports</div>
+            <div class="stat-label">Pending Review</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">@Model.TotalUsers</div>
+            <div class="stat-label">Registered Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">@Model.ActiveSupportLocations</div>
+            <div class="stat-label">Support Locations</div>
+        </div>
+    </div>
+
+    <div class="actions-bar">
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <a asp-action="ManageReports" class="create-button">
+                📋 Manage All Reports
+            </a>
+            @if (User.IsInRole("SuperAdmin"))
+            {
+                <a asp-action="Users" class="create-button" style="background: linear-gradient(135deg, #f4a261 0%, #e76f51 100%);">
+                    👥 Manage Users
+                </a>
+            }
+            <a asp-controller="Support" asp-action="Index" class="create-button" style="background: linear-gradient(135deg, #2c5aa0 0%, #4a7ab8 100%);">
+                🏢 Support Locations
+            </a>
+        </div>
+    </div>
+
+    @if (Model.RecentReports.Any())
+    {
+        <div class="report-card">
+            <div class="report-header">
+                <h3>🚨 Recent Reports Requiring Attention</h3>
+            </div>
+            
+            @foreach (var report in Model.RecentReports.Take(3))
+            {
+                <div class="report-meta" style="margin-bottom: 1rem; border-bottom: 1px solid #e1e5e9; padding-bottom: 1rem;">
+                    <div class="meta-item">
+                        <span class="meta-label">Report #@report.Id</span>
+                        <span class="meta-value">@report.Description</span>
+                    </div>
+                    
+                    <div class="meta-item">
+                        <span class="meta-label">Status</span>
+                        <span class="meta-value">
+                            <span class="status-badge status-@report.Status.ToString().ToLower()">
+                                @report.Status
+                            </span>
+                        </span>
+                    </div>
+                    
+                    <div class="meta-item">
+                        <span class="meta-label">Actions</span>
+                        <span class="meta-value">
+                            <a asp-controller="Report" asp-action="Details" asp-route-id="@report.Id" class="action-btn btn-view">Review</a>
+                        </span>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
