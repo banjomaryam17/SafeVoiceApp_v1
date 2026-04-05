@@ -257,7 +257,7 @@
     @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
     {
         <div class="detail-section">
-            <h3 class="section-title">🗺️ Location Details</h3>
+            <h3 class="section-title">Location Details</h3>
             <div class="detail-grid">
                 <div class="detail-item">
                     <div class="detail-label">Coordinates</div>
@@ -269,7 +269,7 @@
 
     <!-- Timeline -->
     <div class="detail-section">
-        <h3 class="section-title">⏱️ Report Timeline</h3>
+        <h3 class="section-title"> Report Timeline</h3>
         
         <div class="timeline-item">
             <div class="timeline-date">@Model.DateSubmitted.ToString("MMM dd, yyyy HH:mm")</div>
@@ -293,7 +293,7 @@
             @if (User.Identity.IsAuthenticated)
             {
                 <a asp-action="Edit" asp-route-id="@Model.Id" class="action-button btn-edit">
-                    ✏️ Edit Report
+                     Edit Report
                 </a>
             }
             

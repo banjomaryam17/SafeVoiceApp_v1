@@ -19,7 +19,6 @@
             <!-- Incident Details Section -->
             <div class="form-section">
                 <h3 class="section-title">
-                    <span class="icon">📝</span>
                     Incident Details
                 </h3>
                 
@@ -111,7 +110,6 @@
             <!-- Location Section -->
             <div class="form-section">
                 <h3 class="section-title">
-                    <span class="icon">📍</span>
                     Location Information
                 </h3>
                 
@@ -123,7 +121,7 @@
                     
                     <div class="location-helper">
                         <button type="button" class="location-button" id="detectLocation">
-                            📍 Auto-Detect My Location
+                             Auto-Detect My Location
                         </button>
                         <small id="locationStatus" class="text-muted d-block mt-2"></small>
                     </div>
@@ -174,7 +172,7 @@ document.getElementById('detectLocation').addEventListener('click', function() {
     const button = this;
     
     button.disabled = true;
-    button.textContent = '📍 Detecting...';
+    button.textContent = ' Detecting...';
     status.textContent = 'Getting your location...';
     status.className = 'text-muted d-block mt-2';
     
@@ -183,20 +181,20 @@ document.getElementById('detectLocation').addEventListener('click', function() {
             function(position) {
                 document.getElementById('latitudeField').value = position.coords.latitude;
                 document.getElementById('longitudeField').value = position.coords.longitude;
-                status.textContent = '✅ Location detected successfully';
+                status.textContent = ' Location detected successfully';
                 status.className = 'text-success d-block mt-2';
-                button.textContent = '✅ Location Detected';
+                button.textContent = ' Location Detected';
                 button.disabled = false;
             },
             function(error) {
-                status.textContent = '❌ Could not detect location. Please enter manually.';
+                status.textContent = ' Could not detect location. Please enter manually.';
                 status.className = 'text-danger d-block mt-2';
                 button.textContent = '📍 Auto-Detect My Location';
                 button.disabled = false;
             }
         );
     } else {
-        status.textContent = '❌ Geolocation not supported by your browser.';
+        status.textContent = ' Geolocation not supported by your browser.';
         status.className = 'text-danger d-block mt-2';
         button.textContent = '📍 Auto-Detect My Location';
         button.disabled = false;
