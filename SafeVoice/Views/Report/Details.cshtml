@@ -1,90 +1,305 @@
 @model SafeVoice.Models.Report
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = $"Report #{Model.Id} - Details";
+    var canViewSensitive = User.IsInRole("Garda") || User.IsInRole("SocialServices") || User.IsInRole("SuperAdmin");
+    var canManage = User.IsInRole("Moderator") || User.IsInRole("Garda") || User.IsInRole("SocialServices") || User.IsInRole("SuperAdmin");
 }
 
-<h1>Details</h1>
+<link rel="stylesheet" href="~/css/reports.css" />
 
-<div>
-    <h4>Report</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ReportingAs)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ReportingAs)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.VictimName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.VictimName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.VictimAge)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.VictimAge)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.RelationshipToVictim)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.RelationshipToVictim)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ReporterName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ReporterName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ReporterContact)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ReporterContact)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Location)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Location)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Latitude)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Latitude)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Longitude)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Longitude)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DateSubmitted)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DateSubmitted)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<style>
+.report-detail-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(44, 90, 160, 0.1);
+    overflow: hidden;
+}
+
+.report-detail-header {
+    background: linear-gradient(135deg, #2c5aa0 0%, #4a7ab8 100%);
+    color: white;
+    padding: 2rem;
+}
+
+.report-id {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 0.5rem;
+}
+
+.report-title {
+    font-size: 1.8rem;
+    font-weight: 300;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.report-status-header {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.status-large {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.detail-section {
+    padding: 2rem;
+    border-bottom: 1px solid #e1e5e9;
+}
+
+.detail-section:last-child {
+    border-bottom: none;
+}
+
+.section-title {
+    color: #2c5aa0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.detail-item {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #2c5aa0;
+}
+
+.detail-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.detail-value {
+    color: #2c3e50;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.sensitive-info {
+    background: #fff3cd;
+    border-left-color: #ffc107;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.action-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-edit { background: #fd7e14; color: white; }
+.btn-back { background: #6c757d; color: white; }
+
+.btn-edit:hover { background: #dc6a00; color: white; text-decoration: none; }
+.btn-back:hover { background: #5a6268; color: white; text-decoration: none; }
+
+.timeline-item {
+    border-left: 3px solid #dee2e6;
+    padding-left: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+}
+
+.timeline-item:last-child {
+    border-left-color: transparent;
+}
+
+.timeline-date {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.timeline-content {
+    margin-top: 0.25rem;
+    color: #2c3e50;
+}
+
+.status-pending { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+.status-accepted { background: #d1e7dd; color: #0a3622; border: 1px solid #a3cfbb; }
+.status-rejected { background: #f8d7da; color: #58151c; border: 1px solid #f1aeb5; }
+</style>
+
+<div class="report-detail-container">
+    <!-- Header -->
+    <div class="report-detail-header">
+        <div class="report-id">Report #@Model.Id • Submitted @Model.DateSubmitted.ToString("MMMM dd, yyyy 'at' HH:mm")</div>
+        <h1 class="report-title">@Model.Description</h1>
+        
+        <div class="report-status-header">
+            <span class="status-large status-@Model.Status.ToString().ToLower()">@Model.Status</span>
+        </div>
+    </div>
+
+    <!-- Location & Basic Info -->
+    <div class="detail-section">
+        <h3 class="section-title">📍 Incident Information</h3>
+        <div class="detail-grid">
+            <div class="detail-item">
+                <div class="detail-label">Location</div>
+                <div class="detail-value">@Model.Location</div>
+            </div>
+            
+            <div class="detail-item">
+                <div class="detail-label">Reporting Category</div>
+                <div class="detail-value">@Model.ReportingAs</div>
+            </div>
+            
+            @if (Model.VictimAge.HasValue)
+            {
+                <div class="detail-item @(canViewSensitive ? "" : "sensitive-info")">
+                    <div class="detail-label">Age of Person Affected</div>
+                    <div class="detail-value">
+                        @if (canViewSensitive)
+                        {
+                            @Model.VictimAge
+                        }
+                        else
+                        {
+                            <em>Restricted - Authorized Personnel Only</em>
+                        }
+                    </div>
+                </div>
+            }
+            
+            @if (!string.IsNullOrEmpty(Model.RelationshipToVictim))
+            {
+                <div class="detail-item">
+                    <div class="detail-label">Reporter's Relationship</div>
+                    <div class="detail-value">@Model.RelationshipToVictim</div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Contact Information - Sensitive -->
+    @if (canViewSensitive && (!string.IsNullOrEmpty(Model.ReporterName) || !string.IsNullOrEmpty(Model.ReporterContact)))
+    {
+        <div class="detail-section">
+            <h3 class="section-title">👤 Reporter Information</h3>
+            <div style="background: #d4edda; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                <strong>🔒 Sensitive Information:</strong> This data is only visible to authorized personnel.
+            </div>
+            <div class="detail-grid">
+                @if (!string.IsNullOrEmpty(Model.ReporterName))
+                {
+                    <div class="detail-item sensitive-info">
+                        <div class="detail-label">Reporter Name</div>
+                        <div class="detail-value">@Model.ReporterName</div>
+                    </div>
+                }
+                
+                @if (!string.IsNullOrEmpty(Model.ReporterContact))
+                {
+                    <div class="detail-item sensitive-info">
+                        <div class="detail-label">Contact Information</div>
+                        <div class="detail-value">
+                            @if (Model.ReporterContact.Contains("@"))
+                            {
+                                <a href="mailto:@Model.ReporterContact">@Model.ReporterContact</a>
+                            }
+                            else
+                            {
+                                <a href="tel:@Model.ReporterContact">@Model.ReporterContact</a>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else if (!canViewSensitive && (!string.IsNullOrEmpty(Model.ReporterName) || !string.IsNullOrEmpty(Model.ReporterContact)))
+    {
+        <div class="detail-section">
+            <h3 class="section-title">👤 Reporter Information</h3>
+            <div style="background: #fff3cd; padding: 1rem; border-radius: 8px; text-align: center;">
+                <strong>🔒 Access Restricted:</strong> Contact details are only visible to authorized personnel (Garda, Social Services, Administrators).
+            </div>
+        </div>
+    }
+
+    <!-- Location Details -->
+    @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+    {
+        <div class="detail-section">
+            <h3 class="section-title">🗺️ Location Details</h3>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Coordinates</div>
+                    <div class="detail-value">@Model.Latitude?.ToString("F6"), @Model.Longitude?.ToString("F6")</div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Timeline -->
+    <div class="detail-section">
+        <h3 class="section-title">⏱️ Report Timeline</h3>
+        
+        <div class="timeline-item">
+            <div class="timeline-date">@Model.DateSubmitted.ToString("MMM dd, yyyy HH:mm")</div>
+            <div class="timeline-content"><strong>Report Submitted</strong> - Initial report filed in system</div>
+        </div>
+        
+        @if (Model.Status != ReportStatus.Pending)
+        {
+            <div class="timeline-item">
+                <div class="timeline-date">@DateTime.Now.ToString("MMM dd, yyyy HH:mm")</div>
+                <div class="timeline-content"><strong>Status: @Model.Status</strong> - Report has been reviewed</div>
+            </div>
+        }
+    </div>
+
+    <!-- Actions -->
+    <div class="detail-section">
+        <h3 class="section-title">🔧 Actions</h3>
+        
+        <div class="admin-actions">
+            @if (User.Identity.IsAuthenticated)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="action-button btn-edit">
+                    ✏️ Edit Report
+                </a>
+            }
+            
+            <a asp-action="Index" class="action-button btn-back">
+                ← Back to Reports
+            </a>
+        </div>
+    </div>
 </div>

@@ -1,92 +1,169 @@
 @model SafeVoice.Models.Report
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Report";
 }
 
-<h1>Edit</h1>
+<link rel="stylesheet" href="~/css/create-form.css" />
 
-<h4>Report</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="report-container">
+    <div class="report-header">
+        <h1>Edit Report #@Model.Id</h1>
+        <p>Update incident details - all information remains confidential</p>
+    </div>
+    
+    <div class="report-content">
+        <form asp-action="Edit" novalidate>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
+            
+            <!-- Incident Details Section -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <span class="icon">📝</span>
+                    Incident Details
+                </h3>
+                
+                <div class="form-group-enhanced">
+                    <label asp-for="Description" class="form-label-enhanced">Description of Incident *</label>
+                    <textarea asp-for="Description" class="form-control-enhanced" rows="4" 
+                              placeholder="Please provide a clear description of what happened..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="ReportingAs" class="control-label">I am reporting this for:</label>
-                <select asp-for="ReportingAs" class="form-control">
-                    <option value="">-- Please select --</option>
-                    <option value="0">Myself</option>
-                    <option value="1">Someone else</option>
-                    <option value="2">Anonymous (I prefer not to say)</option>
-                </select>
-                <span asp-validation-for="ReportingAs" class="text-danger"></span>
+
+            <!-- Reporting Information Section -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <span class="icon">👤</span>
+                    Reporting Information
+                </h3>
+                
+                <div class="form-group-enhanced">
+                    <label asp-for="ReportingAs" class="form-label-enhanced">I am reporting this for: *</label>
+                    <select asp-for="ReportingAs" class="form-control-enhanced reporting-as-select">
+                        <option value="">-- Please select --</option>
+                        <option value="Myself">Myself</option>
+                        <option value="SomeoneElse">Someone else</option>
+                        <option value="Anonymous">Anonymous (I prefer not to say)</option>
+                    </select>
+                    <span asp-validation-for="ReportingAs" class="text-danger"></span>
+                </div>
+
+                <div class="form-group-enhanced">
+                    <label asp-for="VictimName" class="form-label-enhanced">Person Affected (Name)</label>
+                    <input asp-for="VictimName" class="form-control-enhanced" 
+                           placeholder="First name or initials only" />
+                    <span asp-validation-for="VictimName" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group-enhanced">
+                    <label asp-for="VictimAge" class="form-label-enhanced">Age</label>
+                    <input asp-for="VictimAge" type="number" class="form-control-enhanced" 
+                           placeholder="Age of person affected" min="0" max="18" />
+                    <span asp-validation-for="VictimAge" class="text-danger"></span>
+                </div>
+
+                <div class="form-group-enhanced">
+                    <label asp-for="RelationshipToVictim" class="form-label-enhanced">Your Relationship to the Person</label>
+                    <select asp-for="RelationshipToVictim" class="form-control-enhanced">
+                        <option value="">-- Select relationship --</option>
+                        <option value="Parent/Guardian">Parent/Guardian</option>
+                        <option value="Family Member">Family Member</option>
+                        <option value="Teacher">Teacher</option>
+                        <option value="Friend">Friend</option>
+                        <option value="Neighbor">Neighbor</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <span asp-validation-for="RelationshipToVictim" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="VictimName" class="control-label"></label>
-                <input asp-for="VictimName" class="form-control" />
-                <span asp-validation-for="VictimName" class="text-danger"></span>
+
+            <!-- Contact Information Section -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <span class="icon">📞</span>
+                    Contact Information (Optional)
+                </h3>
+                
+                <div class="help-text">
+                    Providing contact information allows us to follow up if needed, but this is optional for your privacy.
+                </div>
+                
+                <div class="form-group-enhanced">
+                    <label asp-for="ReporterName" class="form-label-enhanced">Your Name</label>
+                    <input asp-for="ReporterName" class="form-control-enhanced" 
+                           placeholder="Your name (optional)" />
+                    <span asp-validation-for="ReporterName" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group-enhanced">
+                    <label asp-for="ReporterContact" class="form-label-enhanced">Contact (Email or Phone)</label>
+                    <input asp-for="ReporterContact" class="form-control-enhanced" 
+                           placeholder="Email or phone number (optional)" />
+                    <span asp-validation-for="ReporterContact" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="VictimAge" class="control-label"></label>
-                <input asp-for="VictimAge" class="form-control" />
-                <span asp-validation-for="VictimAge" class="text-danger"></span>
+
+            <!-- Location Section -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <span class="icon">📍</span>
+                    Location Information
+                </h3>
+                
+                <div class="form-group-enhanced">
+                    <label asp-for="Location" class="form-label-enhanced">Location of Incident *</label>
+                    <input asp-for="Location" class="form-control-enhanced" 
+                           placeholder="e.g., School name, area, or general location" />
+                    <span asp-validation-for="Location" class="text-danger"></span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group-enhanced">
+                        <label asp-for="Latitude" class="form-label-enhanced">Latitude</label>
+                        <input asp-for="Latitude" class="form-control-enhanced" readonly style="background: #f8f9fa;" />
+                    </div>
+                    
+                    <div class="form-group-enhanced">
+                        <label asp-for="Longitude" class="form-label-enhanced">Longitude</label>
+                        <input asp-for="Longitude" class="form-control-enhanced" readonly style="background: #f8f9fa;" />
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="RelationshipToVictim" class="control-label"></label>
-                <input asp-for="RelationshipToVictim" class="form-control" />
-                <span asp-validation-for="RelationshipToVictim" class="text-danger"></span>
+
+            <!-- Status Section (Read-only) -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <span class="icon">⚖️</span>
+                    Report Status
+                </h3>
+                
+                <div class="help-text">
+                    Report status can only be changed by authorized administrators.
+                </div>
+                
+                <div class="form-group-enhanced">
+                    <label class="form-label-enhanced">Current Status</label>
+                    <input type="text" value="@Model.Status" class="form-control-enhanced" readonly style="background: #f8f9fa;" />
+                    <input type="hidden" asp-for="Status" />
+                </div>
+
+                <div class="form-group-enhanced">
+                    <label asp-for="DateSubmitted" class="form-label-enhanced">Date Submitted</label>
+                    <input asp-for="DateSubmitted" type="datetime-local" class="form-control-enhanced" readonly style="background: #f8f9fa;" />
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="ReporterName" class="control-label"></label>
-                <input asp-for="ReporterName" class="form-control" />
-                <span asp-validation-for="ReporterName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ReporterContact" class="control-label"></label>
-                <input asp-for="ReporterContact" class="form-control" />
-                <span asp-validation-for="ReporterContact" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Location" class="control-label"></label>
-                <input asp-for="Location" class="form-control" />
-                <span asp-validation-for="Location" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Latitude" class="control-label"></label>
-                <input asp-for="Latitude" class="form-control" />
-                <span asp-validation-for="Latitude" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Longitude" class="control-label"></label>
-                <input asp-for="Longitude" class="form-control" />
-                <span asp-validation-for="Longitude" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label class="control-label">Status</label>
-                <input type="text" value="Pending" class="form-control" readonly />
-                <input type="hidden" asp-for="Status" />
-                <small class="text-muted">Only administrators can change report status</small>
-            </div>
-            <div class="form-group">
-                <label asp-for="DateSubmitted" class="control-label"></label>
-                <input asp-for="DateSubmitted" class="form-control" />
-                <span asp-validation-for="DateSubmitted" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+            
+            <div class="submit-section">
+                <button type="submit" class="submit-button">
+                    💾 Save Changes
+                </button>
             </div>
         </form>
+        
+        <div style="text-align: center;">
+            <a asp-action="Index" class="back-link">← Back to Reports</a>
+        </div>
     </div>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
