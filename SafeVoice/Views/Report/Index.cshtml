@@ -33,7 +33,6 @@
 
     <div class="actions-bar">
         <a asp-action="Create" class="create-button">
-            <span>📝</span>
             Submit New Report
         </a>
         
@@ -96,13 +95,13 @@
                     
                     <div class="report-actions">
                         <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn-view">
-                            <span>👁</span> View
+                        View
                         </a>
                         <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn btn-edit">
-                            <span>✏️</span> Edit
+                           Edit
                         </a>
                         <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn btn-delete">
-                            <span>🗑</span> Delete
+                            Delete
                         </a>
                     </div>
                 </div>
