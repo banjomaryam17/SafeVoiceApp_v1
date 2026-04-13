@@ -1,157 +1,138 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SafeVoice.Data;
 using SafeVoice.Models;
+using System.Security.Claims;
 
-namespace SafeVoice
+namespace SafeVoice.Controllers;
+
+[Authorize(Roles = "SuperAdmin")]
+public class UsersController : Controller
 {
-    public class UsersController : Controller
+    private readonly AppDbContext _context;
+
+    public UsersController(AppDbContext context)
     {
-        private readonly AppDbContext _context;
+        _context = context;
+    }
 
-        public UsersController(AppDbContext context)
-        {
-            _context = context;
-        }
+    // GET: Users
+    public async Task<IActionResult> Index()
+    {
+        var users = await _context.Users
+            .Include(u => u.Reports)
+            .ToListAsync();
+        return View(users);
+    }
 
-        // GET: Users
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Users.ToListAsync());
-        }
+    // GET: Users/Details/5
+    public async Task<IActionResult> Details(int? id)
+    {
+        if (id == null) return NotFound();
 
-        // GET: Users/Details/5
-        public async Task<IActionResult> Details(int? id)
+        var user = await _context.Users
+            .Include(u => u.Reports)
+            .FirstOrDefaultAsync(m => m.Id == id);
+
+        if (user == null) return NotFound();
+
+        return View(user);
+    }
+
+    // GET: Users/Edit/5
+    public async Task<IActionResult> Edit(int? id)
+    {
+        if (id == null) return NotFound();
+
+        var user = await _context.Users.FindAsync(id);
+        if (user == null) return NotFound();
+
+        return View(user);
+    }
+
+    // POST: Users/Edit/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, User user)
+    {
+        if (id != user.Id) return NotFound();
+
+        if (ModelState.IsValid)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                var existingUser = await _context.Users.FindAsync(id);
+                if (existingUser == null) return NotFound();
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (user == null)
-            {
-                return NotFound();
-            }
+                // Update allowed fields only (don't update password hash)
+                existingUser.Username = user.Username;
+                existingUser.Email = user.Email;
+                existingUser.FirstName = user.FirstName;
+                existingUser.LastName = user.LastName;
+                existingUser.Role = user.Role;
+                existingUser.IsActive = user.IsActive;
+                existingUser.BadgeNumber = user.BadgeNumber;
+                existingUser.Department = user.Department;
 
-            return View(user);
-        }
-
-        // GET: Users/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Users/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Username,Email,PasswordHash,Role,FirstName,LastName,BadgeNumber,Department,IsActive,CreatedAt,LastLogin")] User user)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(user);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                
+                TempData["SuccessMessage"] = $"User {existingUser.Username} updated successfully.";
             }
-            return View(user);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserExists(user.Id))
+                    return NotFound();
+                throw;
+            }
+            return RedirectToAction(nameof(Index));
         }
+        return View(user);
+    }
 
-        // GET: Users/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+    // POST: Users/PromoteRole/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> PromoteRole(int id, UserRole newRole)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user == null) return NotFound();
+
+        var oldRole = user.Role;
+        user.Role = newRole;
+        await _context.SaveChangesAsync();
+
+        TempData["SuccessMessage"] = $"User {user.Username} role changed from {oldRole} to {newRole}.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    // POST: Users/ToggleStatus/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ToggleStatus(int id)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user == null) return NotFound();
+
+        // Don't allow deactivating yourself
+        var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        if (user.Id == currentUserId)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-            return View(user);
-        }
-
-        // POST: Users/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Username,Email,PasswordHash,Role,FirstName,LastName,BadgeNumber,Department,IsActive,CreatedAt,LastLogin")] User user)
-        {
-            if (id != user.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(user);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UserExists(user.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(user);
-        }
-
-        // GET: Users/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return View(user);
-        }
-
-        // POST: Users/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var user = await _context.Users.FindAsync(id);
-            if (user != null)
-            {
-                _context.Users.Remove(user);
-            }
-
-            await _context.SaveChangesAsync();
+            TempData["ErrorMessage"] = "You cannot deactivate your own account.";
             return RedirectToAction(nameof(Index));
         }
 
-        private bool UserExists(int id)
-        {
-            return _context.Users.Any(e => e.Id == id);
-        }
+        user.IsActive = !user.IsActive;
+        await _context.SaveChangesAsync();
+
+        var status = user.IsActive ? "activated" : "deactivated";
+        TempData["SuccessMessage"] = $"User {user.Username} has been {status}.";
+        
+        return RedirectToAction(nameof(Index));
+    }
+
+    private bool UserExists(int id)
+    {
+        return _context.Users.Any(e => e.Id == id);
     }
 }

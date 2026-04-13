@@ -1,95 +1,300 @@
 @model IEnumerable<SafeVoice.Models.User>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "User Management";
 }
 
-<h1>Index</h1>
+<link rel="stylesheet" href="~/css/reports.css" />
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Username)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PasswordHash)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Role)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FirstName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LastName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BadgeNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Department)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsActive)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LastLogin)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Username)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PasswordHash)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Role)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FirstName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BadgeNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Department)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsActive)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastLogin)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+<style>
+.user-management-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(44, 90, 160, 0.1);
+    overflow: hidden;
 }
-    </tbody>
-</table>
+
+.user-management-header {
+    background: linear-gradient(135deg, #2c5aa0 0%, #4a7ab8 100%);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.user-management-title {
+    font-size: 2rem;
+    font-weight: 300;
+    margin: 0;
+    margin-bottom: 0.5rem;
+}
+
+.user-management-subtitle {
+    opacity: 0.9;
+    font-size: 1rem;
+}
+
+.user-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e1e5e9;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #2c5aa0;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.users-table-container {
+    padding: 1.5rem;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.users-table th {
+    background: #f8f9fa;
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 2px solid #e1e5e9;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.users-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e1e5e9;
+    vertical-align: middle;
+}
+
+.users-table tr:hover {
+    background: #f8f9fa;
+}
+
+.role-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.role-superadmin { background: #dc3545; color: white; }
+.role-garda { background: #0d6efd; color: white; }
+.role-socialservices { background: #198754; color: white; }
+.role-moderator { background: #fd7e14; color: white; }
+.role-regular { background: #6c757d; color: white; }
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-active { background: #d1e7dd; color: #0a3622; }
+.status-inactive { background: #f8d7da; color: #58151c; }
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary { background: #2c5aa0; color: white; }
+.btn-warning { background: #fd7e14; color: white; }
+.btn-success { background: #198754; color: white; }
+.btn-danger { background: #dc3545; color: white; }
+
+.btn-sm:hover {
+    opacity: 0.8;
+    text-decoration: none;
+    color: white;
+}
+
+.quick-actions {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-top: 1px solid #e1e5e9;
+}
+
+.role-change-form {
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+
+.role-select {
+    padding: 0.25rem;
+    font-size: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+@@media (max-width: 768px) {
+    .users-table {
+        font-size: 0.8rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .btn-sm {
+        width: 100%;
+        text-align: center;
+    }
+}
+</style>
+
+<div class="user-management-container">
+    <!-- Header -->
+    <div class="user-management-header">
+        <h1 class="user-management-title">User Management</h1>
+        <p class="user-management-subtitle">Manage system users and role permissions</p>
+    </div>
+
+    <!-- Statistics -->
+    <div class="user-stats">
+        <div class="stat-item">
+            <div class="stat-number">@Model.Count()</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">@Model.Count(u => u.IsActive)</div>
+            <div class="stat-label">Active Users</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">@Model.Count(u => u.Role != UserRole.Regular)</div>
+            <div class="stat-label">Admin Users</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">@Model.Count(u => u.Reports?.Count > 0)</div>
+            <div class="stat-label">With Reports</div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="users-table-container">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+        }
+        
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+        }
+
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Joined</th>
+                    <th>Reports</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>
+                            <div>
+                                <strong>@user.Username</strong>
+                                <br>
+                                <small class="text-muted">
+                                    @user.FirstName @user.LastName
+                                    @if (!string.IsNullOrEmpty(user.BadgeNumber))
+                                    {
+                                        <br><em>Badge: @user.BadgeNumber</em>
+                                    }
+                                </small>
+                            </div>
+                        </td>
+                        <td>@user.Email</td>
+                        <td>
+                            <span class="role-badge role-@user.Role.ToString().ToLower()">
+                                @user.Role
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-badge status-@(user.IsActive ? "active" : "inactive")">
+                                @(user.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </td>
+                        <td>@user.CreatedAt.ToString("MMM dd, yyyy")</td>
+                        <td>@(user.Reports?.Count ?? 0)</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a asp-action="Details" asp-route-id="@user.Id" class="btn-sm btn-primary">
+                                    View
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@user.Id" class="btn-sm btn-warning">
+                                    Edit
+                                </a>
+                                
+                                <!-- Role Change -->
+                                <form asp-action="PromoteRole" asp-route-id="@user.Id" method="post" class="role-change-form">
+                                    <select name="newRole" class="role-select" onchange="this.form.submit()">
+                                        <option value="">Change Role</option>
+                                        <option value="Regular"       selected="@(user.Role == UserRole.Regular)">Regular</option>
+                                        <option value="Moderator"     selected="@(user.Role == UserRole.Moderator)">Moderator</option>
+                                        <option value="Garda"         selected="@(user.Role == UserRole.Garda)">Garda</option>
+                                        <option value="SocialServices" selected="@(user.Role == UserRole.SocialServices)">Social Services</option>
+                                        <option value="SuperAdmin"    selected="@(user.Role == UserRole.SuperAdmin)">Super Admin</option>
+                                    </select>
+                                </form>
+
+                                <!-- Toggle Status -->
+                                <form asp-action="ToggleStatus" asp-route-id="@user.Id" method="post" style="display: inline;">
+                                    <button type="submit" class="btn-sm @(user.IsActive ? "btn-danger" : "btn-success")" 
+                                            onclick="return confirm('Are you sure you want to @(user.IsActive ? "deactivate" : "activate") this user?')">
+                                        @(user.IsActive ? "Deactivate" : "Activate")
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <p><strong>Quick Actions:</strong> Select a role from the dropdown to instantly change user permissions. Use activate/deactivate to manage user access without deleting accounts.</p>
+    </div>
+</div>
