@@ -34,16 +34,16 @@
     <div class="actions-bar">
         <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
             <a asp-action="ManageReports" class="create-button">
-                📋 Manage All Reports
+                 Manage All Reports
             </a>
             @if (User.IsInRole("SuperAdmin"))
             {
                 <a asp-action="Users" class="create-button" style="background: linear-gradient(135deg, #f4a261 0%, #e76f51 100%);">
-                    👥 Manage Users
+                     Manage Users
                 </a>
             }
             <a asp-controller="Support" asp-action="Index" class="create-button" style="background: linear-gradient(135deg, #2c5aa0 0%, #4a7ab8 100%);">
-                🏢 Support Locations
+                 Support Locations
             </a>
         </div>
     </div>
@@ -52,7 +52,7 @@
     {
         <div class="report-card">
             <div class="report-header">
-                <h3>🚨 Recent Reports Requiring Attention</h3>
+                <h3> Recent Reports Requiring Attention</h3>
             </div>
             
             @foreach (var report in Model.RecentReports.Take(3))

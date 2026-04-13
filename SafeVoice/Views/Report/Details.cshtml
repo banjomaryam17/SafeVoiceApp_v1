@@ -2,10 +2,20 @@
 
 @{
     ViewData["Title"] = $"Report #{Model.Id} - Details";
-    var canViewSensitive = User.IsInRole("Garda") || User.IsInRole("SocialServices") || User.IsInRole("SuperAdmin");
-    var canManage = User.IsInRole("Moderator") || User.IsInRole("Garda") || User.IsInRole("SocialServices") || User.IsInRole("SuperAdmin");
+    
+    var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    var isOwner = currentUserId != null && Model.SubmittedByUserId.ToString() == currentUserId;
+    
+    var canViewSensitive = isOwner ||
+                           User.IsInRole("Garda") ||
+                           User.IsInRole("SocialServices") ||
+                           User.IsInRole("SuperAdmin");
+                           
+    var canManage = User.IsInRole("Moderator") ||
+                    User.IsInRole("Garda") ||
+                    User.IsInRole("SocialServices") ||
+                    User.IsInRole("SuperAdmin");
 }
-
 <link rel="stylesheet" href="~/css/reports.css" />
 
 <style>
@@ -211,7 +221,7 @@
     @if (!string.IsNullOrEmpty(Model.ReporterName) || !string.IsNullOrEmpty(Model.ReporterContact))
     {
         <div class="detail-section">
-            <h3 class="section-title">👤 Reporter Information</h3>
+            <h3 class="section-title"> Reporter Information</h3>
             @if (canViewSensitive)
             {
                 <div class="detail-grid">
@@ -237,15 +247,6 @@
                     <strong>🔒 Access Restricted:</strong> Contact details only visible to Garda, Social Services, and Super Administrators.
                 </div>
             }
-        </div>
-    }
-    else if (!canViewSensitive && (!string.IsNullOrEmpty(Model.ReporterName) || !string.IsNullOrEmpty(Model.ReporterContact)))
-    {
-        <div class="detail-section">
-            <h3 class="section-title">👤 Reporter Information</h3>
-            <div style="background: #fff3cd; padding: 1rem; border-radius: 8px; text-align: center;">
-                <strong>🔒 Access Restricted:</strong> Contact details are only visible to authorized personnel (Garda, Social Services, Administrators).
-            </div>
         </div>
     }
 
@@ -310,28 +311,18 @@
     @if (canManage && Model.Status == ReportStatus.Pending)
     {
         <div class="detail-section">
-            <h3 class="section-title">⚖️ Report Management</h3>
+            <h3 class="section-title"> Report Management</h3>
             
             <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
                 <strong> Administrative Decision:</strong> This report is awaiting review and decision.
             </div>
             
-            <div class="admin-actions">
-                @if (User.IsInRole("Garda") || User.IsInRole("SocialServices") || User.IsInRole("SuperAdmin"))
-                {
-                    <form asp-controller="Admin" asp-action="ApproveReport" asp-route-id="@Model.Id" method="post" style="display: inline;">
-                        <button type="submit" class="action-button" style="background: #198754; color: white;">
-                             Approve Report
-                        </button>
-                    </form>
-                    
-                    <form asp-controller="Admin" asp-action="RejectReport" asp-route-id="@Model.Id" method="post" style="display: inline;">
-                        <button type="submit" class="action-button" style="background: #dc3545; color: white;">
-                             Reject Report
-                        </button>
-                    </form>
-                }
-            </div>
+            <button onclick="approveReport(@Model.Id)" class="action-button" style="background: #198754; color: white;">
+                Approve Report
+            </button>
+
+            <button onclick="rejectReport(@Model.Id)" class="action-button" style="background: #dc3545; color: white;">Reject Report
+            </button>
         </div>
     }
     <!-- Actions -->
@@ -344,4 +335,48 @@
             </a>
         </div>
     </div>
+    <script>
+// Make approval buttons use AJAX instead of form submission
+function approveReport(reportId) {
+    fetch(`/api/admin/approve/${reportId}`, {
+        method: 'POST',
+        headers: {
+            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            // Update status badge
+            document.querySelector('.status-large').textContent = 'Accepted';
+            document.querySelector('.status-large').className = 'status-large status-accepted';
+            
+            // Hide approval buttons
+            document.querySelector('.admin-actions').innerHTML = 
+                '<p style="color: green;">✅ Report Approved Successfully</p>';
+                
+            alert('Report approved successfully!');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function rejectReport(reportId) {
+    if (confirm('Are you sure you want to reject this report?')) {
+        fetch(`/api/admin/reject/${reportId}`, {
+            method: 'POST',
+            headers: {
+                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Update UI similar to approve
+            document.querySelector('.status-large').textContent = 'Rejected';
+            document.querySelector('.status-large').className = 'status-large status-rejected';
+            alert('Report rejected.');
+        });
+    }
+}
+</script>
 </div>
