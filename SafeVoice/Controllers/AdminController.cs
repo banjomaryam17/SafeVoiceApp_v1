@@ -41,7 +41,7 @@ public class AdminController : Controller
         return View(users);
     }
 
-    [Authorize(Roles = "SuperAdmin")]
+    [Authorize(Roles = "Moderator,Garda,SocialServices,SuperAdmin")]
     public async Task<IActionResult> ManageReports()
     {
         var reports = await _context.Reports

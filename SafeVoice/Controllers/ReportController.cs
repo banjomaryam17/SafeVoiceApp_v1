@@ -29,7 +29,7 @@ namespace SafeVoice.Controllers
             // Role-based access control
             if (User.IsInRole("SuperAdmin") || User.IsInRole("Garda") || User.IsInRole("SocialServices") || User.IsInRole("Moderator"))
             {
-                // Admins/staff can see ALL reports
+                // Admins can see ALL reports
                 reportsQuery = _context.Reports.Include(r => r.SubmittedByUser);
             }
             else
@@ -109,8 +109,7 @@ namespace SafeVoice.Controllers
         }
 
         // POST: ReportController/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Description,ReportingAs,VictimName,VictimAge,RelationshipToVictim,ReporterName,ReporterContact,Location,Latitude,Longitude,Status,DateSubmitted")] Report report)

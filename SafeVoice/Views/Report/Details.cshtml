@@ -208,39 +208,36 @@
     </div>
 
     <!-- Contact Information - Sensitive -->
-    @if (canViewSensitive && (!string.IsNullOrEmpty(Model.ReporterName) || !string.IsNullOrEmpty(Model.ReporterContact)))
+    <!-- Reporter Information - Fix the logic -->
+    @if (!string.IsNullOrEmpty(Model.ReporterName) || !string.IsNullOrEmpty(Model.ReporterContact))
     {
         <div class="detail-section">
             <h3 class="section-title">👤 Reporter Information</h3>
-            <div style="background: #d4edda; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                <strong>🔒 Sensitive Information:</strong> This data is only visible to authorized personnel.
-            </div>
-            <div class="detail-grid">
-                @if (!string.IsNullOrEmpty(Model.ReporterName))
-                {
-                    <div class="detail-item sensitive-info">
-                        <div class="detail-label">Reporter Name</div>
-                        <div class="detail-value">@Model.ReporterName</div>
-                    </div>
-                }
-                
-                @if (!string.IsNullOrEmpty(Model.ReporterContact))
-                {
-                    <div class="detail-item sensitive-info">
-                        <div class="detail-label">Contact Information</div>
-                        <div class="detail-value">
-                            @if (Model.ReporterContact.Contains("@"))
-                            {
-                                <a href="mailto:@Model.ReporterContact">@Model.ReporterContact</a>
-                            }
-                            else
-                            {
-                                <a href="tel:@Model.ReporterContact">@Model.ReporterContact</a>
-                            }
+            @if (canViewSensitive)
+            {
+                <div class="detail-grid">
+                    @if (!string.IsNullOrEmpty(Model.ReporterName))
+                    {
+                        <div class="detail-item">
+                            <div class="detail-label">Reporter Name</div>
+                            <div class="detail-value">@Model.ReporterName</div>
                         </div>
-                    </div>
-                }
-            </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.ReporterContact))
+                    {
+                        <div class="detail-item">
+                            <div class="detail-label">Contact Information</div>
+                            <div class="detail-value">@Model.ReporterContact</div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div style="background: #fff3cd; padding: 1rem; border-radius: 8px;">
+                    <strong>🔒 Access Restricted:</strong> Contact details only visible to Garda, Social Services, and Super Administrators.
+                </div>
+            }
         </div>
     }
     else if (!canViewSensitive && (!string.IsNullOrEmpty(Model.ReporterName) || !string.IsNullOrEmpty(Model.ReporterContact)))
@@ -310,7 +307,34 @@
             </div>
         }
     </div>
-
+    <!-- Report Management (Admin Only) -->
+    @if (canManage && Model.Status == ReportStatus.Pending)
+    {
+        <div class="detail-section">
+            <h3 class="section-title">⚖️ Report Management</h3>
+            
+            <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                <strong>📋 Administrative Decision:</strong> This report is awaiting review and decision.
+            </div>
+            
+            <div class="admin-actions">
+                @if (User.IsInRole("Garda") || User.IsInRole("SocialServices") || User.IsInRole("SuperAdmin"))
+                {
+                    <form asp-controller="Admin" asp-action="ApproveReport" asp-route-id="@Model.Id" method="post" style="display: inline;">
+                        <button type="submit" class="action-button" style="background: #198754; color: white;">
+                            ✅ Approve Report
+                        </button>
+                    </form>
+                    
+                    <form asp-controller="Admin" asp-action="RejectReport" asp-route-id="@Model.Id" method="post" style="display: inline;">
+                        <button type="submit" class="action-button" style="background: #dc3545; color: white;">
+                            ❌ Reject Report
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
+    }
     <!-- Actions -->
     <div class="detail-section">
         <h3 class="section-title"> Actions</h3>
