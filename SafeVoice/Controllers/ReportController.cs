@@ -93,21 +93,30 @@ namespace SafeVoice.Controllers
         }
 
         // GET: ReportController/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            if (id == null) return NotFound();
+    
+            var report = await _context.Reports.FindAsync(id);
+            if (report == null) return NotFound();
+
+            // Only allow report creator to edit, NOT admins
+            if (User.IsInRole("SuperAdmin") || User.IsInRole("Garda") || User.IsInRole("SocialServices") || User.IsInRole("Moderator"))
             {
-                return NotFound();
+                TempData["ErrorMessage"] = "Administrators cannot edit reports to maintain evidence integrity.";
+                return RedirectToAction("Details", new { id });
             }
 
-            var report = await _context.Reports.FindAsync(id);
-            if (report == null)
+            // Only original submitter can edit
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            if (report.SubmittedByUserId != userId)
             {
-                return NotFound();
+                return Forbid();
             }
+
             return View(report);
         }
-
         // POST: ReportController/Edit/5
         
         [HttpPost]

@@ -208,7 +208,6 @@
     </div>
 
     <!-- Contact Information - Sensitive -->
-    <!-- Reporter Information - Fix the logic -->
     @if (!string.IsNullOrEmpty(Model.ReporterName) || !string.IsNullOrEmpty(Model.ReporterContact))
     {
         <div class="detail-section">
@@ -254,7 +253,7 @@
     @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
     {
         <div class="detail-section">
-            <h3 class="section-title">🗺️ Location Details</h3>
+            <h3 class="section-title"> Location Details</h3>
             <div class="detail-grid">
                 <div class="detail-item">
                     <div class="detail-label">Approximate Location</div>
@@ -314,7 +313,7 @@
             <h3 class="section-title">⚖️ Report Management</h3>
             
             <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                <strong>📋 Administrative Decision:</strong> This report is awaiting review and decision.
+                <strong> Administrative Decision:</strong> This report is awaiting review and decision.
             </div>
             
             <div class="admin-actions">
@@ -322,13 +321,13 @@
                 {
                     <form asp-controller="Admin" asp-action="ApproveReport" asp-route-id="@Model.Id" method="post" style="display: inline;">
                         <button type="submit" class="action-button" style="background: #198754; color: white;">
-                            ✅ Approve Report
+                             Approve Report
                         </button>
                     </form>
                     
                     <form asp-controller="Admin" asp-action="RejectReport" asp-route-id="@Model.Id" method="post" style="display: inline;">
                         <button type="submit" class="action-button" style="background: #dc3545; color: white;">
-                            ❌ Reject Report
+                             Reject Report
                         </button>
                     </form>
                 }
@@ -337,18 +336,18 @@
     }
     <!-- Actions -->
     <div class="detail-section">
-        <h3 class="section-title"> Actions</h3>
-        
+        <h3 class="section-title">🔧 Actions</h3>
+    
         <div class="admin-actions">
-            @if (User.Identity.IsAuthenticated)
+            @if (User.Identity.IsAuthenticated && !User.IsInRole("SuperAdmin") && !User.IsInRole("Garda") && !User.IsInRole("SocialServices") && !User.IsInRole("Moderator"))
             {
                 <a asp-action="Edit" asp-route-id="@Model.Id" class="action-button btn-edit">
-                     Edit Report
+                    Edit Report
                 </a>
             }
-            
+        
             <a asp-action="Index" class="action-button btn-back">
-                ← Back to Reports
+                Back to Reports
             </a>
         </div>
     </div>
