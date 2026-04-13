@@ -338,16 +338,9 @@
     <div class="detail-section">
         <h3 class="section-title">🔧 Actions</h3>
     
-        <div class="admin-actions">
-            @if (User.Identity.IsAuthenticated && !User.IsInRole("SuperAdmin") && !User.IsInRole("Garda") && !User.IsInRole("SocialServices") && !User.IsInRole("Moderator"))
-            {
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="action-button btn-edit">
-                    Edit Report
-                </a>
-            }
-        
+        <div class="admin-actions">            
             <a asp-action="Index" class="action-button btn-back">
-                Back to Reports
+                ← Back to Reports
             </a>
         </div>
     </div>
