@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -50,6 +51,74 @@ public class AdminController : Controller
             .OrderByDescending(r => r.DateSubmitted)
             .ToListAsync();
         return View(reports);
+    }
+    // API: Approve Report
+    [HttpPost]
+    [Route("api/admin/approve/{id}")]
+    [Authorize(Roles = "Garda,SocialServices,SuperAdmin")]
+    public async Task<IActionResult> ApiApproveReport(int id)
+    {
+        var report = await _context.Reports.FindAsync(id);
+        if (report == null) 
+            return NotFound(new { message = "Report not found" });
+
+        report.Status = ReportStatus.Accepted;
+        report.DateReviewed = DateTime.Now;
+        report.ReviewedByUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+    
+        await _context.SaveChangesAsync();
+    
+        return Ok(new { 
+            message = "Report approved successfully",
+            reportId = id,
+            status = "Accepted",
+            reviewedAt = report.DateReviewed
+        });
+    }
+
+// API: Reject Report
+    [HttpPost]
+    [Route("api/admin/reject/{id}")]
+    [Authorize(Roles = "Garda,SocialServices,SuperAdmin")]
+    public async Task<IActionResult> ApiRejectReport(int id)
+    {
+        var report = await _context.Reports.FindAsync(id);
+        if (report == null) 
+            return NotFound(new { message = "Report not found" });
+
+        report.Status = ReportStatus.Rejected;
+        report.DateReviewed = DateTime.Now;
+        report.ReviewedByUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+    
+        await _context.SaveChangesAsync();
+    
+        return Ok(new { 
+            message = "Report rejected",
+            reportId = id,
+            status = "Rejected",
+            reviewedAt = report.DateReviewed
+        });
+    }
+
+// API: Get Report Status
+    [HttpGet]
+    [Route("api/reports/{id}/status")]
+    public async Task<IActionResult> GetReportStatus(int id)
+    {
+        var report = await _context.Reports
+            .Include(r => r.ReviewedByUser)
+            .FirstOrDefaultAsync(r => r.Id == id);
+    
+        if (report == null)
+            return NotFound();
+
+        return Ok(new {
+            reportId = id,
+            status = report.Status.ToString(),
+            dateSubmitted = report.DateSubmitted,
+            dateReviewed = report.DateReviewed,
+            reviewedBy = report.ReviewedByUser?.Username
+        });
     }
 }
 
