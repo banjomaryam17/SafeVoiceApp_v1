@@ -150,5 +150,122 @@ public class AccountController : Controller
     {
         return View();
     }
-}
 
+    // External Login (Google/Microsoft)
+    [AllowAnonymous]
+    [HttpPost]
+    public IActionResult ExternalLogin(string provider, string returnUrl = null)
+    {
+        var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl });
+        var properties = new AuthenticationProperties 
+        { 
+            RedirectUri = redirectUrl,
+            Items = { { "scheme", provider } }
+        };
+        return Challenge(properties, provider);
+    }
+
+    // External Login Callback
+    [AllowAnonymous]
+    public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null)
+    {
+        // Get the external login info
+        var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        
+        if (result?.Succeeded != true)
+        {
+            TempData["ErrorMessage"] = "Error loading external login information.";
+            return RedirectToAction(nameof(Login));
+        }
+
+        // Get user info from external provider
+        var externalUser = result.Principal;
+        var email = externalUser.FindFirst(ClaimTypes.Email)?.Value;
+        var name = externalUser.FindFirst(ClaimTypes.Name)?.Value;
+        var givenName = externalUser.FindFirst(ClaimTypes.GivenName)?.Value;
+        var surname = externalUser.FindFirst(ClaimTypes.Surname)?.Value;
+
+        if (string.IsNullOrEmpty(email))
+        {
+            TempData["ErrorMessage"] = "Unable to get email from external provider.";
+            return RedirectToAction(nameof(Login));
+        }
+
+        // Check if user already exists
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+
+        if (user == null)
+        {
+            // Create new user from external login
+            var username = email.Split('@')[0]; // Use email prefix as username
+            
+            // Make sure username is unique
+            var existingUsername = await _context.Users.AnyAsync(u => u.Username == username);
+            if (existingUsername)
+            {
+                username = $"{username}_{new Random().Next(1000, 9999)}";
+            }
+
+            user = new User
+            {
+                Username = username,
+                Email = email,
+                FirstName = givenName ?? name?.Split(' ')[0] ?? "User",
+                LastName = surname ?? (name?.Split(' ').Length > 1 ? string.Join(" ", name.Split(' ').Skip(1)) : ""),
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString()), // Random password for external logins
+                Role = UserRole.Regular,
+                IsActive = true,
+                CreatedAt = DateTime.Now
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+        }
+
+        // Update last login
+        user.LastLogin = DateTime.Now;
+        await _context.SaveChangesAsync();
+
+        // Create claims for our application
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Role, user.Role.ToString()),
+            new Claim("DisplayName", $"{user.FirstName} {user.LastName}".Trim()),
+            new Claim("UserRole", user.Role.GetDisplayName())
+        };
+
+        // Add role-specific claims
+        if (!string.IsNullOrEmpty(user.BadgeNumber))
+            claims.Add(new Claim("BadgeNumber", user.BadgeNumber));
+        
+        if (!string.IsNullOrEmpty(user.Department))
+            claims.Add(new Claim("Department", user.Department));
+
+        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var authProperties = new AuthenticationProperties
+        {
+            IsPersistent = true,
+            ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
+        };
+
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(claimsIdentity),
+            authProperties);
+
+        return RedirectToLocal(returnUrl);
+    }
+
+    // Helper method for redirects
+    private IActionResult RedirectToLocal(string returnUrl)
+    {
+        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            return Redirect(returnUrl);
+        
+        return RedirectToAction("Index", "Home");
+    }
+    
+}

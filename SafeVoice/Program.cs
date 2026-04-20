@@ -13,15 +13,27 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Cookie Authentication
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/Account/Login";
-        options.LogoutPath = "/Account/Logout";
-        options.AccessDeniedPath = "/Account/AccessDenied";
-        options.ExpireTimeSpan = TimeSpan.FromHours(8);
-        options.SlidingExpiration = true;
-    });
+var authBuilder = builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        .AddCookie(options =>
+        {
+            options.LoginPath = "/Account/Login";
+            options.LogoutPath = "/Account/Logout";
+            options.AccessDeniedPath = "/Account/AccessDenied";
+            options.ExpireTimeSpan = TimeSpan.FromHours(8);
+            options.SlidingExpiration = true;
+        })
+        .AddGitHub(options => {
+            options.ClientId = builder.Configuration["Authentication:GitHub:ClientId"];
+            options.ClientSecret = builder.Configuration["Authentication:GitHub:ClientSecret"];
+            options.CallbackPath = "/signin-github";
+            options.Scope.Add("user:email");
+        })
+        .AddGoogle(options => {
+            options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+            options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+            options.CallbackPath = "/signin-google";
+        });
+
 
 // Authorization policies for different roles
 builder.Services.AddAuthorization(options =>
