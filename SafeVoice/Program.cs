@@ -1,12 +1,17 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using SafeVoice.Data;
+using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
+    });
 // Entity Framework
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(
@@ -52,6 +57,7 @@ builder.Services.AddAuthorization(options =>
 });
 
 var app = builder.Build();
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
