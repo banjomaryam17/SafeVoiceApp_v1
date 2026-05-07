@@ -1,9 +1,11 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SafeVoice.Models;
 
 namespace SafeVoice.Controllers;
 
+[AllowAnonymous]
 public class HomeController : Controller
 {
     public IActionResult Index()

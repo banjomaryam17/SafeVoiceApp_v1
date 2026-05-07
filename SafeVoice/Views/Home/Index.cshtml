@@ -1,13 +1,419 @@
 ﻿@{
-    ViewData["Title"] = "SafeVoice - Child Safety Platform";
+    ViewData["Title"] = "SafeVoice - Protecting Children in Ireland";
 }
 
-<script>
-    // Redirect to Reports dashboard
-    window.location.href = '@Url.Action("Index", "Report")';
-</script>
+<style>
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, rgba(44, 90, 160, 0.95) 0%, rgba(74, 122, 184, 0.95) 100%),
+                url('https://images.unsplash.com/photo-1497486751825-1233686d5d80?w=1200') center/cover;
+    color: white;
+    padding: 5rem 2rem;
+    text-align: center;
+    margin-bottom: 3rem;
+}
 
-<div class="text-center">
-    <h1 class="display-4">SafeVoice</h1>
-    <p>Redirecting to Reports Dashboard...</p>
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 300;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    font-weight: 300;
+    opacity: 0.95;
+    margin-bottom: 2rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.hero-btn {
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.btn-primary-hero {
+    background: white;
+    color: #2c5aa0;
+}
+
+.btn-secondary-hero {
+    background: whitesmoke;
+    color: #2c5aa0;
+    border: 2px solid white;
+}
+
+.btn-primary-hero:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    color: #2c5aa0;
+    text-decoration: none;
+}
+
+.btn-secondary-hero:hover {
+    background: rgba(255,255,255,0.1);
+    transform: translateY(-2px);
+    color: white;
+    text-decoration: none;
+}
+
+/* Statistics Section */
+.stats-section {
+    background: #f8f9fa;
+    padding: 3rem 2rem;
+    margin-bottom: 3rem;
+}
+
+.stats-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #2c5aa0;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 1.1rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* Benefits Section */
+.benefits-section {
+    max-width: 1200px;
+    margin: 0 auto 4rem;
+    padding: 0 2rem;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: #2c3e50;
+    margin-bottom: 3rem;
+}
+
+.benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.benefit-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    border-left: 4px solid #2c5aa0;
+}
+
+.benefit-card:hover {
+    box-shadow: 0 8px 25px rgba(44, 90, 160, 0.15);
+    transform: translateY(-3px);
+}
+
+.benefit-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.benefit-title {
+    font-size: 1.5rem;
+    color: #2c5aa0;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.benefit-description {
+    color: #6c757d;
+    line-height: 1.6;
+}
+
+/* How It Works */
+.how-it-works {
+    background: linear-gradient(135deg, #2c5aa0 0%, #4a7ab8 100%);
+    color: white;
+    padding: 4rem 2rem;
+    margin-bottom: 3rem;
+}
+
+.steps-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.step-card {
+    text-align: center;
+    padding: 2rem;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.step-number {
+    width: 60px;
+    height: 60px;
+    background: white;
+    color: #2c5aa0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 auto 1rem;
+}
+
+.step-title {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.step-description {
+    opacity: 0.95;
+    line-height: 1.5;
+}
+
+/* CTA Section */
+.cta-section {
+    max-width: 800px;
+    margin: 0 auto 4rem;
+    padding: 3rem 2rem;
+    text-align: center;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.cta-title {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+.cta-text {
+    font-size: 1.1rem;
+    color: #6c757d;
+    margin-bottom: 2rem;
+}
+
+/* Mobile Responsive */
+@@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+}
+</style>
+
+<!-- Hero Section -->
+<div class="hero-section">
+    <h1 class="hero-title">Safe. Secure. Anonymous.</h1>
+    <p class="hero-subtitle">
+        SafeVoice empowers everyone in Ireland to report child safety concerns with confidence and compassion.
+    </p>
+    <div class="hero-buttons">
+        <a href="@Url.Action("Create", "Report")" class="hero-btn btn-primary-hero">
+            Report an Incident
+        </a>
+        <a href="@Url.Action("Index", "Support")" class="hero-btn btn-secondary-hero">
+            Find Help Now
+        </a>
+    </div>
+</div>
+
+<!-- Statistics Section -->
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="stats-section">
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Always Available</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Confidential</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">5+</div>
+                <div class="stat-label">Support Services</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">Free</div>
+                <div class="stat-label">No Cost Ever</div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Benefits Section -->
+<div class="benefits-section">
+    <h2 class="section-title">Why Choose SafeVoice?</h2>
+    <div class="benefits-grid">
+        <div class="benefit-card">
+            <div class="benefit-icon">🔒</div>
+            <h3 class="benefit-title">Complete Anonymity</h3>
+            <p class="benefit-description">
+                Report incidents without creating an account. Your identity is protected, and no personal information is required unless you choose to share it.
+            </p>
+        </div>
+        
+        <div class="benefit-card">
+            <div class="benefit-icon">📱</div>
+            <h3 class="benefit-title">Easy to Use</h3>
+            <p class="benefit-description">
+                Simple, clear forms guide you through reporting. Works on any device - phone, tablet, or computer. No technical knowledge needed.
+            </p>
+        </div>
+        
+        <div class="benefit-card">
+            <div class="benefit-icon">🇮🇪</div>
+            <h3 class="benefit-title">Irish-Specific Resources</h3>
+            <p class="benefit-description">
+                Direct connections to Garda stations, Tusla offices, and HSE services across Ireland. Real contact information for immediate help.
+            </p>
+        </div>
+        
+        <div class="benefit-card">
+            <div class="benefit-icon">📍</div>
+            <h3 class="benefit-title">Location-Based Help</h3>
+            <p class="benefit-description">
+                Find the nearest support services automatically. Get directions to Garda stations, counseling centers, and emergency services.
+            </p>
+        </div>
+        
+        <div class="benefit-card">
+            <div class="benefit-icon">👥</div>
+            <h3 class="benefit-title">Professional Review</h3>
+            <p class="benefit-description">
+                Every report is reviewed by trained professionals including Garda officers and social services personnel who can take appropriate action.
+            </p>
+        </div>
+        
+        <div class="benefit-card">
+            <div class="benefit-icon">📊</div>
+            <h3 class="benefit-title">Track Your Reports</h3>
+            <p class="benefit-description">
+                Register for an account to view your report history, track status updates, and receive follow-up communications from authorities.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works -->
+<div class="how-it-works">
+    <h2 class="section-title" style="color: white;">How SafeVoice Works</h2>
+    <div class="steps-container">
+        <div class="step-card">
+            <div class="step-number">1</div>
+            <h3 class="step-title">Report</h3>
+            <p class="step-description">
+                Describe the incident using our simple form. Include as much or as little detail as you're comfortable sharing.
+            </p>
+        </div>
+        
+        <div class="step-card">
+            <div class="step-number">2</div>
+            <h3 class="step-title">Review</h3>
+            <p class="step-description">
+                Trained professionals including Garda and social workers review your report within 24-48 hours.
+            </p>
+        </div>
+        
+        <div class="step-card">
+            <div class="step-number">3</div>
+            <h3 class="step-title">Action</h3>
+            <p class="step-description">
+                Appropriate authorities take action to investigate and protect the welfare of the child or young person.
+            </p>
+        </div>
+        
+        <div class="step-card">
+            <div class="step-number">4</div>
+            <h3 class="step-title">Support</h3>
+            <p class="step-description">
+                Access ongoing support services and resources. Find counseling, legal help, and community support nearby.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="cta-section">
+    <h2 class="cta-title">Every Child Deserves Safety</h2>
+    <p class="cta-text">
+        If you're aware of a child at risk, don't wait. Your report could save a life. 
+        SafeVoice makes it easy to speak up and take action.
+    </p>
+    <div class="hero-buttons">
+        @if (!User.Identity.IsAuthenticated)
+        {
+            <a href="@Url.Action("Register", "Account")" class="hero-btn btn-primary-hero">
+                Create Free Account
+            </a>
+        }
+        else
+        {
+            <a href="@Url.Action("Index", "Report")" class="hero-btn btn-primary-hero">
+                View My Reports
+            </a>
+        }
+        <a href="@Url.Action("Index", "Support")" class="hero-btn btn-secondary-hero">
+            Emergency Contacts
+        </a>
+    </div>
 </div>

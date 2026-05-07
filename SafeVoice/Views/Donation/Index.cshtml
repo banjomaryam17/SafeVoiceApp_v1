@@ -74,18 +74,53 @@
         <p>Your donation helps us keep this platform running and protect children across Ireland. Every euro makes a difference.</p>
     </div>
 
-    <form asp-action="CreateCheckoutSession" method="post">
-        <p style="font-weight: 600; color: #1a3557; margin-bottom: 1rem;">Choose an amount:</p>
-        <div class="amount-grid">
-            <button type="submit" name="amount" value="5" class="amount-btn">€5</button>
-            <button type="submit" name="amount" value="10" class="amount-btn">€10</button>
-            <button type="submit" name="amount" value="20" class="amount-btn">€20</button>
-            <button type="submit" name="amount" value="50" class="amount-btn">€50</button>
-            <button type="submit" name="amount" value="100" class="amount-btn">€100</button>
-            <button type="submit" name="amount" value="5" class="amount-btn" style="font-size:0.85rem;">Custom</button>
-        </div>
-        <p style="font-size: 0.8rem; color: #6b7a99; margin-top: 0.5rem;">You'll be redirected to Stripe's secure checkout.</p>
-    </form>
+   <form asp-action="CreateCheckoutSession" method="post">
+    <p style="font-weight: 600; color: #1a3557; margin-bottom: 1rem;">Choose an amount:</p>
+    <div class="amount-grid">
+        <button type="button" class="amount-btn" onclick="setAmount(5)">€5</button>
+        <button type="button" class="amount-btn" onclick="setAmount(10)">€10</button>
+        <button type="button" class="amount-btn" onclick="setAmount(20)">€20</button>
+        <button type="button" class="amount-btn" onclick="setAmount(50)">€50</button>
+        <button type="button" class="amount-btn" onclick="setAmount(100)">€100</button>
+        <button type="button" class="amount-btn" onclick="showCustom()">Custom</button>
+    </div>
 
-    <div class="secure-badge">🔒 Payments secured by Stripe</div>
+    <div id="custom-input" style="display:none; margin-top: 1rem;">
+        <label style="font-size: 0.875rem; color: #6b7a99;">Enter amount (€):</label>
+        <input type="number" id="custom-amount" min="1" placeholder="e.g. 30"
+               style="width:100%; padding: 10px 14px; border: 1.5px solid #dce8f5; border-radius: 8px; font-size: 1rem; margin-top: 0.4rem;"
+               oninput="setAmount(this.value)" />
+    </div>
+
+    <input type="hidden" name="amount" id="selected-amount" value="" />
+
+    <p id="selected-label" style="font-size: 0.9rem; color: #2c5aa0; margin-top: 1rem; font-weight: 500;"></p>
+
+    <button type="submit" class="donate-submit" id="donate-btn" disabled
+            style="opacity: 0.5; cursor: not-allowed;">
+        Donate Now
+    </button>
+    <p style="font-size: 0.8rem; color: #6b7a99; margin-top: 0.5rem;">You'll be redirected to Stripe's secure checkout.</p>
+</form>
+
+<script>
+    function setAmount(val) {
+        const amount = parseInt(val);
+        if (!amount || amount < 1) return;
+
+        document.getElementById('selected-amount').value = amount;
+        document.getElementById('selected-label').textContent = `Selected: €${amount}`;
+        document.getElementById('donate-btn').disabled = false;
+        document.getElementById('donate-btn').style.opacity = '1';
+        document.getElementById('donate-btn').style.cursor = 'pointer';
+
+        // Highlight selected preset button
+        document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('selected'));
+    }
+
+    function showCustom() {
+        document.getElementById('custom-input').style.display = 'block';
+        document.getElementById('custom-input').querySelector('input').focus();
+    }
+</script>
 </div>
