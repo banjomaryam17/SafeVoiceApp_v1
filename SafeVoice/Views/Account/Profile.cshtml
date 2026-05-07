@@ -1,0 +1,222 @@
+@model SafeVoice.Models.User
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<style>
+    .profile-wrapper {
+        max-width: 800px;
+        margin: 3rem auto;
+        padding: 0 1rem;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, #1a3557 0%, #2c5aa0 100%);
+        border-radius: 16px;
+        padding: 2.5rem;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .profile-avatar {
+        width: 90px;
+        height: 90px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        flex-shrink: 0;
+        border: 3px solid rgba(255,255,255,0.4);
+    }
+
+    .profile-header h1 {
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin: 0 0 0.25rem;
+    }
+
+    .profile-header p {
+        margin: 0;
+        opacity: 0.8;
+        font-size: 0.95rem;
+    }
+
+    .role-badge {
+        display: inline-block;
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        padding: 0.25rem 0.75rem;
+        border-radius: 100px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-top: 0.5rem;
+    }
+
+    .profile-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(44,90,160,0.08);
+        margin-bottom: 1.5rem;
+        border: 1px solid #eef2f8;
+    }
+
+    .profile-card h2 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1a3557;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #eef2f8;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.8rem;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .info-item label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.3rem;
+    }
+
+    .info-item p {
+        color: #1a3557;
+        font-size: 0.95rem;
+        font-weight: 500;
+        margin: 0;
+    }
+
+    .status-active {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: #16a34a;
+        font-weight: 500;
+    }
+
+    .status-active::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        background: #16a34a;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #6b7a99;
+        font-size: 0.875rem;
+        text-decoration: none;
+        margin-bottom: 1.5rem;
+        transition: color 0.2s;
+    }
+
+    .btn-back:hover {
+        color: #1a3557;
+        text-decoration: none;
+    }
+</style>
+
+<div class="profile-wrapper">
+    <a href="@Url.Action("Index", "Home")" class="btn-back">← Back to Home</a>
+
+    <div class="profile-header">
+        <div class="profile-avatar">
+            @(Model.FirstName?.Substring(0, 1).ToUpper() ?? "?")
+        </div>
+        <div>
+            <h1>@Model.FirstName @Model.LastName</h1>
+            <p>@Model.Email</p>
+            <span class="role-badge">@Model.Role.GetDisplayName()</span>
+        </div>
+    </div>
+
+    <div class="profile-card">
+        <h2>Account Information</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <label>Username</label>
+                <p>@Model.Username</p>
+            </div>
+            <div class="info-item">
+                <label>First Name</label>
+                <p>@(Model.FirstName ?? "—")</p>
+            </div>
+            <div class="info-item">
+                <label>Last Name</label>
+                <p>@(Model.LastName ?? "—")</p>
+            </div>
+            <div class="info-item">
+                <label>Email</label>
+                <p>@Model.Email</p>
+            </div>
+            <div class="info-item">
+                <label>Account Status</label>
+                <p>
+                    @if (Model.IsActive)
+                    {
+                        <span class="status-active">Active</span>
+                    }
+                    else
+                    {
+                        <span style="color: #dc2626;">Inactive</span>
+                    }
+                </p>
+            </div>
+            <div class="info-item">
+                <label>Member Since</label>
+                <p>@Model.CreatedAt.ToString("dd MMM yyyy")</p>
+            </div>
+            @if (Model.LastLogin.HasValue)
+            {
+                <div class="info-item">
+                    <label>Last Login</label>
+                    <p>@Model.LastLogin.Value.ToString("dd MMM yyyy HH:mm")</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.BadgeNumber) || !string.IsNullOrEmpty(Model.Department))
+    {
+        <div class="profile-card">
+            <h2>Professional Details</h2>
+            <div class="info-grid">
+                @if (!string.IsNullOrEmpty(Model.BadgeNumber))
+                {
+                    <div class="info-item">
+                        <label>Badge Number</label>
+                        <p>@Model.BadgeNumber</p>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(Model.Department))
+                {
+                    <div class="info-item">
+                        <label>Department</label>
+                        <p>@Model.Department</p>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
